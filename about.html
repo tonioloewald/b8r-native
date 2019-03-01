@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>About Box</h1>
+  <h1>About</h1>
   <p>
     Created with <a href="https://electronjs.org">Electron</a> and <a href="https://bindinator.com">bindinator</a>.
   </p>
@@ -22,6 +22,8 @@
     const {app} = require('electron').remote
     const version = app.getVersion()
     const {node, electron, chrome} = process.versions
+    const h1 = document.querySelector('h1')
+    h1.innerText = `About ${app.getName()}`
     const p = document.createElement('p')
     p.innerText = `Version App ${version}, Node ${node}, Chrome ${chrome}, Electron ${electron}`
     document.body.append(p)
