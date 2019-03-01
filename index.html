@@ -5,24 +5,32 @@
   <title>b8r — native</title>
   <link rel="stylesheet" type="text/css" href="node_modules/@tonioloewald/b8r/css/b8r.css">
   <link rel="stylesheet" type="text/css" href="icomoon/style.css">
+</head>
+<body data-event="keydown(ctrl-shift-I):app.toggleDebug">
+  <!-- this is where the action is -->
+  <b8r-component
+    style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh"
+    path="components/electron-file-browser"
+  ></b8r-component>
   <script type="module">
     // using the source version of b8r.js because we import from libraries that import
     // directly from b8r source files.
     import b8r from 'es6://node_modules/@tonioloewald/b8r/source/b8r.js';
-    import {isElectron, isNwjs} from 'es6://node_modules/@tonioloewald/b8r/lib/runtime-environment.js';
-    // for convenience when debugging
+
+    // You really don't need to do anything else; the stuff below is just for convenience
+
+    // uncomment this line if you need to know your runtime environment here
+    // import {isElectron, isNwjs} from 'es6://node_modules/@tonioloewald/b8r/lib/runtime-environment.js';
+
+    // for convenience when debugging we'll expose b8r as a global
     window.b8r = b8r;
+
+    // this implements a hidden keystroke for toggling the debug tools
     b8r.register('app', {
       toggleDebug() {
         require('electron').remote.getCurrentWebContents().toggleDevTools()
       }
     })
   </script>
-</head>
-<body data-event="keydown(ctrl-shift-I):app.toggleDebug">
-  <b8r-component
-    style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh"
-    path="components/electron-file-browser"
-  ></b8r-component>
 </body>
 </html>
