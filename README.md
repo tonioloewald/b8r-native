@@ -75,4 +75,6 @@ This example makes extensive use of shell commands to finds RAW image files
 using macOS's spotlight command line tools and generates previews using the quicklook 
 command line tools. 
 
-It's not quite as fast as purely native applications like FastRAWViewer, but it's surprisingly good.
+It's not quite as fast as purely native applications like 
+[FastRAWViewer](https://www.fastrawviewer.com/) or [RAWPower](https://gentlemencoders.com/)
+(both of which I use and recommend), but it's surprisingly good.
