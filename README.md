@@ -61,8 +61,8 @@ local libraries as well as stuff from the `b8r` package.
 
 ## RAW Viewer Example
 
-A simpler but prettier example is the **raw-viewer** which you can check out by
-going into index.html and simply changing:
+A simpler but perhaps more exciting example is the **raw-viewer** which you can 
+check out by going into index.html and simply changing:
 
 ```
 <b8r-component path="component/electron-file-browser"></b8r-component>
@@ -75,9 +75,9 @@ to:
 <b8r-component path="component/raw-viewer"></b8r-component>
 ```
 
-This example makes extensive use of shell commands to finds RAW image files 
-using macOS's spotlight command line tools and generates previews using the quicklook 
-command line tools. 
+This example makes extensive use of shell commands to find RAW image files 
+using macOS's spotlight command line tools and generates thumbnails and full size views 
+using the quicklook command line tools. 
 
 It's not quite as fast as purely native applications like 
 [FastRAWViewer](https://www.fastrawviewer.com/) or [RAWPower](https://gentlemencoders.com/)
