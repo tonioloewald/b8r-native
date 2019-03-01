@@ -1,9 +1,11 @@
 # b8r-native
 
+![b8r-native in action](images/b8r-native.png)
+
 This is a stub for creating native desktop apps with [bindinator](https://bindinator.com)
 using [Electron](https://electronjs.org) or (eventually) [NWJS](https://nwjs.io).
 
-Usage:
+## Usage
 
 Copy or clone this repo, and then:
 
@@ -36,9 +38,11 @@ Aside from that, all main.js really does is open a `BrowserWindow` with `index.h
 
 ## index.html
 
-All that really happens here is that we load `b8r.js` and insert a single `<b8r-component>`
-tag to load the app's base component. (Two example components are provided, each is a simple
-self-contained application.)
+The key thing this file does is import global CSS files, import `b8r.js`, and insert a 
+single `<b8r-component>` tag to load the app's base component.
+
+Two example components are provided, each is a simple
+self-contained application. Also see comments inside the file.
 
 ## Other Stuff
 
