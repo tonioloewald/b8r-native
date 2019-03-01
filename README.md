@@ -26,6 +26,20 @@ To build:
 npm run dist
 ```
 
+## main.js
+
+This is the entry point for electron. Most notably it sets up a custom protocol because
+`b8r` uses ESM (i.e. import vs. require) and Electron does not (currently) allow you
+to load javascript modules via the `file:` protocol.
+
+Aside from that, all main.js really does is open a `BrowserWindow` with `index.html` in it.
+
+## index.html
+
+All that really happens here is that we load `b8r.js` and insert a single `<b8r-component>`
+tag to load the app's base component. (Two example components are provided, each is a simple
+self-contained application.)
+
 ## Other Stuff
 
 There's a `build` folder with `icon.png` in it that you'll want to replace to change your
@@ -35,11 +49,13 @@ icon.
 
 And, finally, customize `about.html` to give your application a custom "About Box".
 
-## Two Examples
+## File Browser Example
 
 By default, the application created will be a simple file browser. This is a pretty
 extensive example since it makes use of the Electron and Node APIs, includes
 local libraries as well as stuff from the `b8r` package.
+
+## RAW Viewer Example
 
 A simpler but prettier example is the **raw-viewer** which you can check out by
 going into index.html and simply changing:
