@@ -1,0 +1,25 @@
+{
+  "name": "b8r-native-example",
+  "version": "0.0.1",
+  "description": "native app template for b8r",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "javascript",
+    "electron",
+    "nwjs"
+  ],
+  "author": "Tonio Loewald",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@tonioloewald/b8r": "^0.2.10"
+  },
+  "devDependencies": {
+    "electron": "^4.0.5",
+    "electron-builder": "^20.38.5"
+  }
+}

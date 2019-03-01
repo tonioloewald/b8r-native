@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>About</title>
+  <style>
+    body {
+      padding: 20px; 
+      font-family: Sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>About Box</h1>
+  <p>
+    Created with <a href="https://electronjs.org">Electron</a> and <a href="https://bindinator.com">bindinator</a>.
+  </p>
+  <script>
+    const {app} = require('electron').remote
+    const version = app.getVersion()
+    const {node, electron, chrome} = process.versions
+    const p = document.createElement('p')
+    p.innerText = `Version App ${version}, Node ${node}, Chrome ${chrome}, Electron ${electron}`
+    document.body.append(p)
+  </script>
+</body>
+</html>
