@@ -46,7 +46,7 @@ app.on( 'ready', () => {
 
 function createWindow () {
   // Create the browser window.
-  let win = new BrowserWindow({ width: 800, height: 600 })
+  let win = new BrowserWindow({ minWidth: 512, minHeight: 384, width: 800, height: 600 })
 
   // and load the index.html of the app.
   win.loadFile('index.html')
