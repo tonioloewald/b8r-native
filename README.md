@@ -76,7 +76,7 @@ to:
 ```
 
 This (Mac-only) example makes extensive use of shell commands to find RAW image files 
-using macOS's spotlight command line tool `mdfind`, extracts metadata using `mdls` 
+using macOS's spotlight command line tool `mdfind`, extracts metadata using `mdls`, 
 and generates thumbnails and full size views using the quicklook command line tool
 `qlmanage`. 
 
