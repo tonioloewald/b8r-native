@@ -75,9 +75,10 @@ to:
 <b8r-component path="component/raw-viewer"></b8r-component>
 ```
 
-This example makes extensive use of shell commands to find RAW image files 
-using macOS's spotlight command line tools and generates thumbnails and full size views 
-using the quicklook command line tools. 
+This (Mac-only) example makes extensive use of shell commands to find RAW image files 
+using macOS's spotlight command line tool `mdfind`, extracts metadata using `mdls` 
+and generates thumbnails and full size views using the quicklook command line tool
+`qlmanage`. 
 
 It's not quite as fast as purely native applications like 
 [FastRAWViewer](https://www.fastrawviewer.com/) or [RAWPower](https://gentlemencoders.com/)
