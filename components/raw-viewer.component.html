@@ -692,7 +692,15 @@ grid cells that are currently in view.
 
   set({slice, pick, closeDetail, rawfiles: [], edit, reveal, preview, tag, update_filter, trash});
 
-  findFiles('NEF');
-  findFiles('DNG');
-  findFiles('CR2');
+  // This is where we decide which kinds of files to look for
+  // I haven't tried to import everything -- https://en.wikipedia.org/wiki/Raw_image_format
+  findFiles('NEF'); // Nikon
+  findFiles('DNG'); // Adobe DNG files are used by a lot of cameras
+  findFiles('CR2'); // Canon
+  findFiles('RW2'); // Panasonic
+
+  // Not tested
+  findFiles('ARW'); // Sony
+  findFiles('RAF'); // Fuji
+  findFiles('ORF'); // Olympus
 </script>
