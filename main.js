@@ -6,7 +6,12 @@ const nfs = require( 'fs' )
 const npjoin = require( 'path' ).join
 const es6Path = __dirname
 
-protocol.registerStandardSchemes( [ 'es6' ] )
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'es6',
+    privileges: {standard: true, secure: true, supportFetchAPI: true}
+  }
+])
 
 const mimeTypes = {
   text: 'text/plain',
@@ -46,7 +51,13 @@ app.on( 'ready', () => {
 
 function createWindow () {
   // Create the browser window.
-  let win = new BrowserWindow({ minWidth: 512, minHeight: 384, width: 800, height: 600 })
+  let win = new BrowserWindow({ 
+    minWidth: 512, 
+    minHeight: 384, 
+    width: 800, 
+    height: 600,
+    webPreferences: { nodeIntegration: true }
+  })
 
   // and load the index.html of the app.
   win.loadFile('index.html')
