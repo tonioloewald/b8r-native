@@ -6,7 +6,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 <style>
   .documentation-component .electron-file-browser-component {
     height: 50vh;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid var(--black-10));
   }
 
   .electron-file-browser-component :focus,
@@ -17,15 +17,15 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   .electron-file-browser-component {
     max-height: 100vh;
-    background: white;
+    background: var(--background-color);
   }
 
   .electron-file-browser-component > .fb-header {
     -webkit-app-region: drag;
     padding: 5px 8px;
     flex-shrink: 0;
-    border-bottom: 1px solid #ccc;
-    background: #e7e7e7;
+    border-bottom: 1px solid var(--black-10);
+    background: var(--black-10);
   }
 
   .electron-file-browser-component > .fb-header button,
@@ -49,7 +49,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   .electron-file-browser-component.disabled:after {
     content: "requires electron or nwjs";
-    color: white;
+    color: var(--background-color);
     background-color: red;
     margin: 10px;
     padding: 4px 8px;
@@ -77,7 +77,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 2px 5px;
-    border-right: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid var(--black-10);
     position: relative;
     height: 20px;
     font-size: 12px;
@@ -100,20 +100,20 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   }
 
   .electron-file-browser-component .shaded {
-    background-color: rgba(0,0,0,0.03);
+    background-color: var(--black-5);
   }
 
   .electron-file-browser-component .file:hover {
-    background-color: rgba(0,255,64,0.1);
+    background-color: var(--light-accent-color);
   }
 
   .electron-file-browser-component .file:focus {
-    background-color: rgba(0,255,64,0.2);
+    background-color: var(--bright-accent-color);
   }
 
   .electron-file-browser-component .icon-file-empty,
   .electron-file-browser-component .icon-folder {
-    color: #0b0;
+    color: var(--dark-accent-color);
     margin-right: 5px;
   }
 
@@ -136,8 +136,8 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     padding: 4px 8px;
     position: fixed;
     border-radius: 5px;
-    background: white;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    background: var(--background-color);
+    filter: drop-shadow(0 2px 4px var(--shadow-50));
   }
 
   .menu-top:after {
@@ -148,7 +148,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     left: 50%;
     width: 8px;
     height: 8px;
-    background: white;
+    background: var(--background-color);
     z-index: -1;
     transform: translateX(-50%) rotateZ(45deg);
   }
@@ -161,7 +161,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     right: 10px;
     width: 8px;
     height: 8px;
-    background: white;
+    background: var(--background-color);
     z-index: -1;
     transform: translateX(-50%) rotateZ(45deg);
   }
@@ -216,7 +216,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     <span style="font-size: 50%; line-height: 50%; vertical-align: 60%; margin-left: 2px" class="icon-arrow-down3"></span>
   </button>
 </div>
-<div style="flex-shrink: 0; background: #eee; border-bottom: 1px solid #ccc;">
+<div style="flex-shrink: 0; background: var(--black-10); border-bottom: 1px solid var(--black-10);">
   <div class="faux-tr">
     <span class="file-name">Name</span>
     <span class="file-size">Size</span>
@@ -274,9 +274,10 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     pick = () => {
       dialog.showOpenDialog(
         getCurrentWindow(),
-        { properties: ['openDirectory', 'createDirectory'], },
-        list_path
-      );
+        { properties: ['openDirectory', 'createDirectory'], }
+      ).then(({filePaths}) => {
+        if(filePaths.length) list_path(filePaths[0])
+      })
     };
 
     home = () => list_path(app.getPath('home'));
@@ -436,9 +437,20 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   on('mousedown', '_component_.hide_menus');
 
-  set ( { parent, home, pick, open, filter, pick_folder, show_folders, show_settings, hide_menus } );
+  set ({
+    parent,
+    home,
+    pick,
+    open,
+    filter,
+    pick_folder,
+    show_folders,
+    show_settings,
+    show_hidden: false,
+    hide_menus 
+  });
 
-  menu.setApplicationMenu([
+  false && menu.setApplicationMenu([
     {
       label: 'File',
       submenu: [
