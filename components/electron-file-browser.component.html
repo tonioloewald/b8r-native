@@ -254,7 +254,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   </div>
 </div>
 <div class="settings-menu menu-top-right" style="display: none">
-  <label data-event="mousedown:_bur_.stopEvent">
+  <label data-event="mousedown:_b8r_.stopEvent">
     <input type="checkbox" data-bind="checked=_component_.show_hidden">
     Show Hidden
   </label>
@@ -265,6 +265,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   'use strict';
   const {biggrid} = await import('../lib/biggrid.js')
   const menu = require('./lib/electron-menu.js')
+  const {isPackaged} = require('./lib/is-packaged.js')
   const {isElectron, isNwjs} = await import('../lib/runtime-environment.js')
   let pick, home;
 
@@ -436,7 +437,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   on('mousedown', '_component_.hide_menus');
 
-  set ( { parent, home, pick, open, filter, pick_folder, show_folders, show_settings, hide_menus } );
+  set ( { parent, home, pick, open, filter, pick_folder, show_folders, show_settings, hide_menus, show_hidden: false } );
 
   menu.setApplicationMenu([
     {
@@ -447,6 +448,22 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
           click: pick,
           accelerator: 'CommandOrControl+O'
         },
+        ...(isPackaged ? [] : [{
+          label: 'Toggle Developer Tools',
+          click() {
+            const {remote} = require('electron')
+            remote.getCurrentWindow().webContents.toggleDevTools()
+          },
+          accelerator: 'Command+Shift+I'
+        },
+        {
+          label: 'Reload',
+          click() {
+            const {remote} = require('electron')
+            remote.getCurrentWindow().webContents.reload()
+          },
+          accelerator: 'Command+R'
+        }])
       ],
     },
     menu.editMenu,
