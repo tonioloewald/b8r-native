@@ -1,6 +1,6 @@
 {
   "name": "b8r-native-example",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "native app template for b8r",
   "main": "main.js",
   "scripts": {
