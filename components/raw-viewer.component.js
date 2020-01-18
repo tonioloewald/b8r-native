@@ -411,12 +411,12 @@ export default {
     </table>
   </div>`,
   load: async ({ get, set, component, b8r, touch, findOne }) => {
-    const {biggrid} = await import('//node_modules/@tonioloewald/b8r/lib/biggrid.js');
-    const {imagePromise} = await import('//node_modules/@tonioloewald/b8r/source/b8r.imgSrc.js');
-    const {viaTag} = await import('//node_modules/@tonioloewald/b8r/lib/scripts.js');
-    const {jsfeat} = await viaTag('./node_modules/@tonioloewald/b8r/third-party/jsfeat-min.js');
-    const {resize, relayTo} = await import('//node_modules/@tonioloewald/b8r/lib/resize.js');
-    const {isElectron} = await import('//node_modules/@tonioloewald/b8r/lib/runtime-environment.js');
+    const {biggrid} = await import('es6://node_modules/@tonioloewald/b8r/lib/biggrid.js');
+    const {imagePromise} = await import('es6://node_modules/@tonioloewald/b8r/source/b8r.imgSrc.js');
+    const {viaTag} = await import('es6://node_modules/@tonioloewald/b8r/lib/scripts.js');
+    const {jsfeat} = await viaTag('es6://node_modules/@tonioloewald/b8r/third-party/jsfeat-min.js');
+    const {resize, relayTo} = await import('es6://node_modules/@tonioloewald/b8r/lib/resize.js');
+    const {isElectron} = await import('es6://node_modules/@tonioloewald/b8r/lib/runtime-environment.js');
     const scroller = findOne('.raw-viewer-scroller');
 
     if (! isElectron || window.process.platform !== 'darwin') {
