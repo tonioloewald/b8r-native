@@ -365,7 +365,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
         path,
         name: path.split('/').pop() || '/',
         root: path.length <= 1,
-        files: items.
+        files: (items || []).
           filter(name => !/\r/.test(name)).
           map(name => {
             return {
