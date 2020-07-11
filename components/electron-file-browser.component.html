@@ -302,8 +302,12 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   b8r.addDataBinding(component, 'class(show-hidden)', `${data.componentId}.show_hidden`);
 
   const _get_stats = (path, file) => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       fs.stat(path + '/' + file.name, function(err, stats) {
+        if (err || !stats) {
+          console.error('stat failed for', file.name, err)
+          reject(err)
+        }
         const {size, mode, atimeMs, ctimeMs, mtimeMs} = stats;
         // optimization -- we change the file directly and don't touch it
         Object.assign(file, {
@@ -366,7 +370,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
         name: path.split('/').pop() || '/',
         root: path.length <= 1,
         files: (items || []).
-          filter(name => !/\r/.test(name)).
+          filter(name => !/\r/.test(name)). // FIXME filter out protected files in Windows
           map(name => {
             return {
               name,
