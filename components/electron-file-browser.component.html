@@ -22,8 +22,9 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   .electron-file-browser-component > .fb-header {
     -webkit-app-region: drag;
-    padding: 5px 8px;
-    flex-shrink: 0;
+    padding: 5px 10px;
+    display: flex;
+    flex: 0 0 41px;
     border-bottom: 1px solid var(--black-10);
     background: var(--black-10);
   }
@@ -39,7 +40,9 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .fb-header .folder-name,
   .fb-header .folder-name > * {
     cursor: default;
-    vertical-align: middle;
+    line-height: 30px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .electron-file-browser-component {
@@ -133,7 +136,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top,
   .menu-top-right {
     margin-top: 4px;
-    padding: 4px 8px;
+    padding: 2px 4px;
     position: fixed;
     border-radius: 5px;
     background: var(--bg-color);
@@ -169,6 +172,8 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top > *,
   .menu-top-right > * {
     vertical-align: middle;
+    padding: 4px 8px;
+    border-radius: 3px;
     display: block;
     z-index: 2;
     font-size: 12px;
@@ -178,13 +183,10 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top > *:hover,
   .menu-top-right > *:hover {
     background: var(--light-accent-color);
-    padding: 1px 5px;
-    margin: -1px -5px;
-    border-radius: 3px;
     cursor: default;
   }
 </style>
-<div class="fb-header" style="display: flex;">
+<div class="fb-header">
   <button
     data-event="click:_component_.home"
     title="home folder"
@@ -204,20 +206,18 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     <span data-bind="text=_component_.name"></span>
   </span>
   <span style="flex-grow: 1"></span>
-  <span class="icon-search3" style="position: relative; top: 5px; margin-right: -22px"></span>
+  <span class="icon-search3" style="position: relative; top: 8px; margin-right: -24px"></span>
   <input
     class="search"
     placeholder="name filter"
     data-bind="value=_component_.filter_text"
-    style="padding-left: 24px; font-size: 12px"
+    style="padding-left: 30px; font-size: 12px"
   >
   <button data-event="mousedown:_component_.show_settings">
     <span class="icon-cog2"></span>
     <span style="font-size: 50%; line-height: 50%; vertical-align: 60%; margin-left: 2px" class="icon-arrow-down3"></span>
   </button>
 </div>
-<b8r-component name="data-table" style="flex: 1 1 auto">
-</b8r-component>
 <div style="flex-shrink: 0; background: var(--black-10); border-bottom: 1px solid var(--black-10);">
   <div class="faux-tr">
     <span class="file-name">Name</span>
@@ -457,7 +457,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     show_folders,
     show_settings,
     show_hidden: false,
-    hide_menus 
+    hide_menus
   });
 
   menu.setApplicationMenu([
@@ -475,7 +475,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
             const {remote} = require('electron')
             remote.getCurrentWindow().webContents.toggleDevTools()
           },
-          accelerator: 'Command+Shift+I'
+          accelerator: 'CommandOrControl+Shift+I'
         },
         {
           label: 'Reload',
@@ -483,7 +483,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
             const {remote} = require('electron')
             remote.getCurrentWindow().webContents.reload()
           },
-          accelerator: 'Command+R'
+          accelerator: 'CommandOrControl+R'
         }])
       ],
     },
