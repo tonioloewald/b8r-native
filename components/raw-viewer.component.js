@@ -52,7 +52,7 @@ grid cells that are currently in view.
 * Edit Finder comments directly (and possibly allow file renaming)
 */
 export default {
-  css:`
+  css: `
   .raw-viewer-component {
     display: flex;
     position: relative;
@@ -268,7 +268,7 @@ export default {
     width: 140px;
   }`,
 
-  html:`
+  html: `
   <div
     class="raw-viewer-scroller"
     data-bind="class(one-column)=_component_.rawfile"
@@ -411,61 +411,61 @@ export default {
     </table>
   </div>`,
   load: async ({ get, set, component, b8r, touch, findOne }) => {
-    const {biggrid} = await import('//node_modules/@tonioloewald/b8r/lib/biggrid.js');
-    const {imagePromise} = await import('//node_modules/@tonioloewald/b8r/source/b8r.imgSrc.js');
-    const {viaTag} = await import('//node_modules/@tonioloewald/b8r/lib/scripts.js');
-    const {jsfeat} = await viaTag('./node_modules/@tonioloewald/b8r/third-party/jsfeat-min.js');
-    const {resize, relayTo} = await import('//node_modules/@tonioloewald/b8r/lib/resize.js');
-    const {isElectron} = await import('//node_modules/@tonioloewald/b8r/lib/runtime-environment.js');
-    const scroller = findOne('.raw-viewer-scroller');
+    const { biggrid } = await import('//node_modules/@tonioloewald/b8r/lib/biggrid.js')
+    const { imagePromise } = await import('//node_modules/@tonioloewald/b8r/source/b8r.imgSrc.js')
+    const { viaTag } = await import('//node_modules/@tonioloewald/b8r/lib/scripts.js')
+    const { jsfeat } = await viaTag('./node_modules/@tonioloewald/b8r/third-party/jsfeat-min.js')
+    const { resize, relayTo } = await import('//node_modules/@tonioloewald/b8r/lib/resize.js')
+    const { isElectron } = await import('//node_modules/@tonioloewald/b8r/lib/runtime-environment.js')
+    const scroller = findOne('.raw-viewer-scroller')
 
-    if (! isElectron || window.process.platform !== 'darwin') {
-      b8r.hide(component);
-      return;
+    if (!isElectron || window.process.platform !== 'darwin') {
+      b8r.hide(component)
+      return
     }
 
-    if (! component.matches('.example')) {
-      document.body.style.overflow = 'hidden';
+    if (!component.matches('.example')) {
+      document.body.style.overflow = 'hidden'
     }
 
-    relayTo(scroller);
+    relayTo(scroller)
 
     /* electron-require */
-    const fs = require('fs');
-    const {exec} = require('child_process');
+    const fs = require('fs')
+    const { exec } = require('child_process')
 
-    const MAX_PROCESSING = 4;
-    const PREVIEW_SIZE = 256;
-    const PREGENERATE_PREVIEWS = true;
-    const PREVIEW_PATH = `/tmp/thumbs-${PREVIEW_SIZE}`;
-    const FULLSIZE_PATH = `/tmp/fullsize`;
-    let rawfiles_visible = [];
-    let processing = 0;
+    const MAX_PROCESSING = 4
+    const PREVIEW_SIZE = 256
+    const PREGENERATE_PREVIEWS = true
+    const PREVIEW_PATH = `/tmp/thumbs-${PREVIEW_SIZE}`
+    const FULLSIZE_PATH = '/tmp/fullsize'
+    let rawfiles_visible = []
+    let processing = 0
 
-    const canvas = b8r.create('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-    const context2d = canvas.getContext('2d');
+    const canvas = b8r.create('canvas')
+    canvas.width = 256
+    canvas.height = 256
+    const context2d = canvas.getContext('2d')
 
-    const reportError = err => { if (err) console.error(err); };
+    const reportError = err => { if (err) console.error(err) }
 
-    const extract_date = datestring => datestring.match(/[0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}/)[0];
-    const filter = {filename: '', tags: ''};
-    filter.min_date = filter.max_date = extract_date(new Date().toISOString());
-    set({filter});
-    set({sort_by: 'date'});
+    const extract_date = datestring => datestring.match(/[0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}/)[0]
+    const filter = { filename: '', tags: '' }
+    filter.min_date = filter.max_date = extract_date(new Date().toISOString())
+    set({ filter })
+    set({ sort_by: 'date' })
 
     const process = rawfile => {
-      const {_auto_, filepath, tags} = rawfile;
-      const preview = `${PREVIEW_PATH}/${rawfile.filename}.png`;
-      //console.log('generating', preview, {processing, waiting: waiting.length});
-      set(`rawfiles[_auto_=${_auto_}].generating_preview`, true);
+      const { _auto_, filepath, tags } = rawfile
+      const preview = `${PREVIEW_PATH}/${rawfile.filename}.png`
+      // console.log('generating', preview, {processing, waiting: waiting.length});
+      set(`rawfiles[_auto_=${_auto_}].generating_preview`, true)
 
       const done = () => {
         // if the component has been removed, allows processing to stop cleanly
-        if(document.body.contains(component)) {
-          set(`rawfiles[_auto_=${_auto_}].generating_preview`, false);
-          set(`rawfiles[_auto_=${_auto_}].preview`, 'file://' + preview);
+        if (document.body.contains(component)) {
+          set(`rawfiles[_auto_=${_auto_}].generating_preview`, false)
+          set(`rawfiles[_auto_=${_auto_}].preview`, 'file://' + preview)
           imagePromise('file://' + preview).then(img => {
             /*
             // FAST
@@ -475,30 +475,30 @@ export default {
             jsfeat.yape06.min_eigen_value_threshold = 75;
             */
             // YAPE
-            jsfeat.yape.init(256, 256, 3, 1);
+            jsfeat.yape.init(256, 256, 3, 1)
 
-            const corners = [], border=2;
+            const corners = []; const border = 2
             // you should use preallocated keypoint_t array
-            for(let i = 0; i < 256 * 256; ++i) {
-              corners[i] = new jsfeat.keypoint_t(0,0,0,0);
+            for (let i = 0; i < 256 * 256; ++i) {
+              corners[i] = new jsfeat.keypoint_t(0, 0, 0, 0)
             }
-            const img_u8 = new jsfeat.matrix_t(256, 256, jsfeat.U8_t | jsfeat.C1_t);
-            context2d.drawImage(img, 0, 0, 256, 256);
-            const imageData = context2d.getImageData(0, 0, 256, 256);
-            jsfeat.imgproc.grayscale(imageData.data, 256, 256, img_u8);
-            jsfeat.imgproc.equalize_histogram(img_u8, img_u8);
+            const img_u8 = new jsfeat.matrix_t(256, 256, jsfeat.U8_t | jsfeat.C1_t)
+            context2d.drawImage(img, 0, 0, 256, 256)
+            const imageData = context2d.getImageData(0, 0, 256, 256)
+            jsfeat.imgproc.grayscale(imageData.data, 256, 256, img_u8)
+            jsfeat.imgproc.equalize_histogram(img_u8, img_u8)
             // const fast = jsfeat.fast_corners.detect(img_u8, corners, border);
             // const yape06 = jsfeat.yape06.detect(img_u8, corners, border);
-            const yape = jsfeat.yape.detect(img_u8, corners, border);
-            set(`rawfiles[_auto_=${_auto_}].yape`, yape);
+            const yape = jsfeat.yape.detect(img_u8, corners, border)
+            set(`rawfiles[_auto_=${_auto_}].yape`, yape)
             if (yape < 100) {
-              set(`rawfiles[_auto_=${_auto_}].blurred`, true);
+              set(`rawfiles[_auto_=${_auto_}].blurred`, true)
             }
-          });
-          processing -= 1;
-          dequeue();
+          })
+          processing -= 1
+          dequeue()
         }
-      };
+      }
 
       const get_preview = () => {
         fs.access(preview, fs.constants.R_OK, err => {
@@ -510,202 +510,202 @@ export default {
               // `sips -s format jpeg -r ${rot} -s formatOptions 75 -Z ${PREVIEW_SIZE} "${filepath}" --out "${preview}"`,
               err => {
                 if (err) {
-                  console.error(`${filepath} RAW conversion failed`, err);
+                  console.error(`${filepath} RAW conversion failed`, err)
                 } else {
-                  done();
+                  done()
                 }
               }
-            );
+            )
           } else {
-            done();
+            done()
           }
-        });
-      };
+        })
+      }
 
       exec(
         `mdls "${filepath}"`,
         (err, stdout) => {
           if (err) {
-            console.error(`${filepath} metadata extraction failed`, err);
+            console.error(`${filepath} metadata extraction failed`, err)
           } else {
-            const metadata = {};
+            const metadata = {}
             stdout.split('\nkMD').forEach(item => {
-              const [_key, value] = item.split('=').map(s => s.trim());
-              const key = _key.replace(/^(FS)?(Item)?(FS)?(Content)?(Acquisition)?(Display)?/, '');
+              const [_key, value] = item.split('=').map(s => s.trim())
+              const key = _key.replace(/^(FS)?(Item)?(FS)?(Content)?(Acquisition)?(Display)?/, '')
               if (key && !value.match(/^(\s+|\(null\))$/)) {
                 metadata[key] = value.indexOf('(') === -1
-                                ? value.match(/^"*(.*?)"*$/m)[1] // strip outer quotation marks
-                                : value.match(/\w[^,)"]*/g).map(s => s.trim());
+                  ? value.match(/^"*(.*?)"*$/m)[1] // strip outer quotation marks
+                  : value.match(/\w[^,)"]*/g).map(s => s.trim())
               }
-            });
-            const creation_date = extract_date(metadata.CreationDate);
+            })
+            const creation_date = extract_date(metadata.CreationDate)
             if (creation_date && creation_date < filter.min_date) {
-              filter.min_date = creation_date;
-              touch('filter.min_date');
+              filter.min_date = creation_date
+              touch('filter.min_date')
             }
             if (metadata.UserTags) {
-              metadata.UserTags.forEach(t => tags[t] = true);
-              touch(`rawfiles[_auto_=${_auto_}].tags`);
+              metadata.UserTags.forEach(t => tags[t] = true)
+              touch(`rawfiles[_auto_=${_auto_}].tags`)
             }
             if (metadata.ExposureTimeSeconds < 1) {
-              metadata.ExposureTimeSeconds = '1/' + Math.round(1/metadata.ExposureTimeSeconds);
+              metadata.ExposureTimeSeconds = '1/' + Math.round(1 / metadata.ExposureTimeSeconds)
             }
-            set(`rawfiles[_auto_=${_auto_}].metadata`, metadata);
-            get_preview();
+            set(`rawfiles[_auto_=${_auto_}].metadata`, metadata)
+            get_preview()
           }
         }
-      );
-    };
+      )
+    }
 
     const dequeue = () => {
       if (processing >= MAX_PROCESSING) {
-        return;
+        return
       }
 
-      const waiting = rawfiles_visible.filter(f => ! f.preview);
-      const list = waiting.length || ! PREGENERATE_PREVIEWS ? waiting : get('rawfiles').filter(f => ! f.preview);
-      while(processing < MAX_PROCESSING && list.length) {
-        const rand = Math.floor(Math.random() * list.length);
-        processing += 1;
-        const rawfile = list.splice(rand, 1)[0];
-        process(rawfile);
+      const waiting = rawfiles_visible.filter(f => !f.preview)
+      const list = waiting.length || !PREGENERATE_PREVIEWS ? waiting : get('rawfiles').filter(f => !f.preview)
+      while (processing < MAX_PROCESSING && list.length) {
+        const rand = Math.floor(Math.random() * list.length)
+        processing += 1
+        const rawfile = list.splice(rand, 1)[0]
+        process(rawfile)
         // if list is waiting_on_screen we also need to remove item from waiting
         if (waiting.indexOf(rawfile) > -1) {
-          waiting.splice(waiting.indexOf(rawfile), 1);
+          waiting.splice(waiting.indexOf(rawfile), 1)
         }
       }
-    };
+    }
 
     const findFiles = extension => {
-      const rawfiles = get('rawfiles');
+      const rawfiles = get('rawfiles')
       exec(
         `mdfind "kMDItemDisplayName == '*.${extension}'"`,
-        {maxBuffer: 1024 * 10000}, // 10MB buffer because
+        { maxBuffer: 1024 * 10000 }, // 10MB buffer because
         (err, stdout) => {
           if (err) {
-            console.error('spotlight search failed', err);
+            console.error('spotlight search failed', err)
           } else {
-            stdout.split('\n').
-            filter(f => !!f).
-            forEach(
-              filepath => {
-                const filename = filepath.split('/').pop();
-                if (filename[0] !== '.') { // skip hidden files
-                  rawfiles.push({
-                    filename,
-                    basename: filename.split('.').slice(0,-1).join('.'),
-                    filepath,
-                    tags: {},
-                  });
+            stdout.split('\n')
+              .filter(f => !!f)
+              .forEach(
+                filepath => {
+                  const filename = filepath.split('/').pop()
+                  if (filename[0] !== '.') { // skip hidden files
+                    rawfiles.push({
+                      filename,
+                      basename: filename.split('.').slice(0, -1).join('.'),
+                      filepath,
+                      tags: {}
+                    })
+                  }
                 }
-              }
-            );
-            set({rawfiles});
+              )
+            set({ rawfiles })
           }
         }
-      );
-    };
+      )
+    }
 
     const pick = evt => {
-      const rawfile = b8r.getListInstance(evt.target);
+      const rawfile = b8r.getListInstance(evt.target)
 
       if (!rawfile.fullsize) {
-        const {filepath} = rawfile;
-        rawfile.fullsize = rawfile.preview;
-        const fullsize = `${FULLSIZE_PATH}/${rawfile.basename}.jpg`;
-        rawfile.generating_fullsize = true;
-        const rot = rawfile.metadata.Orientation === '1' ? -90 : 0;
+        const { filepath } = rawfile
+        rawfile.fullsize = rawfile.preview
+        const fullsize = `${FULLSIZE_PATH}/${rawfile.basename}.jpg`
+        rawfile.generating_fullsize = true
+        const rot = rawfile.metadata.Orientation === '1' ? -90 : 0
         exec(
           `mkdir -p ${FULLSIZE_PATH} && ` +
           `sips -s format jpeg -r ${rot} -s formatOptions 90 "${filepath}" --out "${fullsize}"`,
           err => {
             if (err) {
-              console.error(`${filepath} RAW conversion failed`, err);
+              console.error(`${filepath} RAW conversion failed`, err)
             } else {
-              imagePromise('file://' + fullsize).
-              then(() => {
-                rawfile.generating_fullsize = false;
-                rawfile.fullsize = 'file://' + fullsize;
-                touch('rawfile');
-              });
+              imagePromise('file://' + fullsize)
+                .then(() => {
+                  rawfile.generating_fullsize = false
+                  rawfile.fullsize = 'file://' + fullsize
+                  touch('rawfile')
+                })
             }
           }
-        );
+        )
       } else {
-        rawfile.generating_fullsize = false;
+        rawfile.generating_fullsize = false
       }
-      set({rawfile});
-      console.log(rawfile);
-      b8r.trigger('resize', scroller);
-    };
+      set({ rawfile })
+      console.log(rawfile)
+      b8r.trigger('resize', scroller)
+    }
 
     const closeDetail = () => {
-      set('rawfile', null);
-      b8r.afterUpdate(() => b8r.trigger('resize', scroller));
-    };
+      set('rawfile', null)
+      b8r.afterUpdate(() => b8r.trigger('resize', scroller))
+    }
 
     const sort_methods = {
-      date: (a, b) => !a.metdata || !b.metadata ? 0 :
-                      a.metadata.CreationDate < b.metadata.CreationDate ? -1 : 1,
-      filename: (a, b) => a.filename < b.filename ? -1 : 1,
-    };
+      date: (a, b) => !a.metdata || !b.metadata ? 0
+        : a.metadata.CreationDate < b.metadata.CreationDate ? -1 : 1,
+      filename: (a, b) => a.filename < b.filename ? -1 : 1
+    }
 
     const slice = (list, container) => {
-      const filter = get('filter');
-      const required_tags = (filter.tags || '').split(',').map(s => s.trim()).filter(s => !!s);
+      const filter = get('filter')
+      const required_tags = (filter.tags || '').split(',').map(s => s.trim()).filter(s => !!s)
       const filtered = list.filter(rawfile => {
-        const {CreationDate} = rawfile.metadata || {};
-        const created = CreationDate ? extract_date(CreationDate) : false;
+        const { CreationDate } = rawfile.metadata || {}
+        const created = CreationDate ? extract_date(CreationDate) : false
         return (!filter.filename || rawfile.filename.includes(filter.filename)) &&
                (
                  !rawfile.tags ||
                  required_tags.filter(t => rawfile.tags[t]).length === required_tags.length
                ) &&
-               (!created || (created >= filter.min_date && created <= filter.max_date));
-      });
-      rawfiles_visible = biggrid.slice(filtered.sort(sort_methods[get('sort_by')]), container);
-      dequeue();
-      return rawfiles_visible;
-    };
+               (!created || (created >= filter.min_date && created <= filter.max_date))
+      })
+      rawfiles_visible = biggrid.slice(filtered.sort(sort_methods[get('sort_by')]), container)
+      dequeue()
+      return rawfiles_visible
+    }
 
     const edit = () => {
-      exec(`open "${get('rawfile.filepath')}"`, reportError);
-    };
+      exec(`open "${get('rawfile.filepath')}"`, reportError)
+    }
     const reveal = () => {
-      exec(`open -R "${get('rawfile.filepath')}"`, reportError);
-    };
+      exec(`open -R "${get('rawfile.filepath')}"`, reportError)
+    }
     const preview = () => {
-      exec(`qlmanage -p "${get('rawfile.filepath')}"`, reportError);
-    };
+      exec(`qlmanage -p "${get('rawfile.filepath')}"`, reportError)
+    }
     const tag = () => {
-      const {tags, filepath} = get('rawfile');
-      const xml = b8r.filterKeys(tags, v => v).map(t => `<string>${t}</string>`).join('');
-      const command = `xattr -w com.apple.metadata:_kMDItemUserTags '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><array>${xml}</array></plist>' "${filepath}"`;
-      exec(command, reportError);
-    };
-    const update_filter = b8r.debounce(() => touch('rawfiles'), 500);
+      const { tags, filepath } = get('rawfile')
+      const xml = b8r.filterKeys(tags, v => v).map(t => `<string>${t}</string>`).join('')
+      const command = `xattr -w com.apple.metadata:_kMDItemUserTags '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><array>${xml}</array></plist>' "${filepath}"`
+      exec(command, reportError)
+    }
+    const update_filter = b8r.debounce(() => touch('rawfiles'), 500)
     const trash = () => {
-      const rawfile = get('rawfile');
-      const rawfiles = get('rawfiles');
-      rawfiles.splice(rawfiles.indexOf(rawfile), 1);
-      exec(`mv "${rawfile.filepath}" ~/.Trash`);
-      closeDetail();
-      set('rawfile', null);
-      touch('rawfiles');
-    };
+      const rawfile = get('rawfile')
+      const rawfiles = get('rawfiles')
+      rawfiles.splice(rawfiles.indexOf(rawfile), 1)
+      exec(`mv "${rawfile.filepath}" ~/.Trash`)
+      closeDetail()
+      set('rawfile', null)
+      touch('rawfiles')
+    }
 
-    set({slice, pick, closeDetail, rawfiles: [], edit, reveal, preview, tag, update_filter, trash});
+    set({ slice, pick, closeDetail, rawfiles: [], edit, reveal, preview, tag, update_filter, trash })
 
     // This is where we decide which kinds of files to look for
     // I haven't tried to import everything -- https://en.wikipedia.org/wiki/Raw_image_format
-    findFiles('NEF'); // Nikon
-    findFiles('DNG'); // Adobe DNG files are used by a lot of cameras
-    findFiles('CR2'); // Canon
-    findFiles('RW2'); // Panasonic
+    findFiles('NEF') // Nikon
+    findFiles('DNG') // Adobe DNG files are used by a lot of cameras
+    findFiles('CR2') // Canon
+    findFiles('RW2') // Panasonic
 
     // Not tested
-    findFiles('ARW'); // Sony
-    findFiles('RAF'); // Fuji
-    findFiles('ORF'); // Olympus
+    findFiles('ARW') // Sony
+    findFiles('RAF') // Fuji
+    findFiles('ORF') // Olympus
   }
 }
