@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "npx standard --fix && electron-builder",
+    "lint": "node node_modules/standard/bin/cmd.js --fix"
   },
   "keywords": [
     "javascript",
@@ -16,13 +17,23 @@
   "author": "Tonio Loewald",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "@tonioloewald/b8r": "^0.2.23",
-    "electron": "^7.1.2",
-    "electron-builder": "^21.2.0"
+    "@tonioloewald/b8r": "^0.3.0",
+    "electron": "^7.3.2",
+    "electron-builder": "^21.2.0",
+    "standard": "^14.3.4"
   },
   "build": {
     "mac": {
       "darkModeSupport": true
     }
+  },
+  "standard": {
+    "ignore": [
+      "/icomoon/",
+      "/branches/",
+      "/third-party/",
+      "raw-viewer.component.js",
+      "/build/"
+    ]
   }
 }

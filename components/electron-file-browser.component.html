@@ -22,8 +22,9 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 
   .electron-file-browser-component > .fb-header {
     -webkit-app-region: drag;
-    padding: 5px 8px;
-    flex-shrink: 0;
+    padding: 5px 10px;
+    display: flex;
+    flex: 0 0 41px;
     border-bottom: 1px solid var(--black-10);
     background: var(--black-10);
   }
@@ -39,7 +40,9 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .fb-header .folder-name,
   .fb-header .folder-name > * {
     cursor: default;
-    vertical-align: middle;
+    line-height: 30px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .electron-file-browser-component {
@@ -133,7 +136,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top,
   .menu-top-right {
     margin-top: 4px;
-    padding: 4px 8px;
+    padding: 2px 4px;
     position: fixed;
     border-radius: 5px;
     background: var(--content-bg-color);
@@ -169,6 +172,8 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top > *,
   .menu-top-right > * {
     vertical-align: middle;
+    padding: 4px 8px;
+    border-radius: 3px;
     display: block;
     z-index: 2;
     font-size: 12px;
@@ -178,13 +183,10 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   .menu-top > *:hover,
   .menu-top-right > *:hover {
     background: var(--light-accent-color);
-    padding: 1px 5px;
-    margin: -1px -5px;
-    border-radius: 3px;
     cursor: default;
   }
 </style>
-<div class="fb-header" style="display: flex;">
+<div class="fb-header">
   <button
     data-event="click:_component_.home"
     title="home folder"
@@ -204,12 +206,12 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     <span data-bind="text=_component_.name"></span>
   </span>
   <span style="flex-grow: 1"></span>
-  <span class="icon-search3" style="position: relative; top: 5px; margin-right: -22px"></span>
+  <span class="icon-search3" style="position: relative; top: 8px; margin-right: -24px"></span>
   <input
     class="search"
     placeholder="name filter"
     data-bind="value=_component_.filter_text"
-    style="padding-left: 24px; font-size: 12px"
+    style="padding-left: 30px; font-size: 12px"
   >
   <button data-event="mousedown:_component_.show_settings">
     <span class="icon-cog2"></span>
@@ -267,10 +269,10 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   const menu = require('./lib/electron-menu.js')
   const {isPackaged} = require('./lib/is-packaged.js')
   const {isElectron, isNwjs} = await import('../lib/runtime-environment.js')
-  let pick, home;
+  let pick, home, pathDelimiter
 
   if (isElectron) {
-    const {dialog, getCurrentWindow, app} = require('electron').remote
+    const {dialog, getCurrentWindow, app, process} = require('electron').remote
 
     pick = () => {
       dialog.showOpenDialog(
@@ -281,16 +283,18 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
       })
     };
 
-    home = () => list_path(app.getPath('home'));
+    home = () => list_path(app.getPath('home'))
+    pathDelimiter = process.platform === 'win32' ? '\\' : '/'
   } else if (isNwjs) {
-    const file = b8r.create('input');
-    file.type = 'file';
-    file.setAttribute('webkitdirectory', '');
-    file.onchange = () => list_path(file.value.split(';')[0].split('/').slice(0,-1).join('/'));
+    const file = b8r.create('input')
+    file.type = 'file'
+    file.setAttribute('webkitdirectory', '')
+    file.onchange = () => list_path(file.value.split(';')[0].split('/').slice(0,-1).join('/'))
 
     pick = file.click.bind(file);
 
-    home = () => list_path(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
+    home = () => list_path(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'])
+    pathDelimiter = process.platform === 'win32' ? '\\' : '/'
   } else {
     return
   }
@@ -302,15 +306,20 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   b8r.addDataBinding(component, 'class(show-hidden)', `${data.componentId}.show_hidden`);
 
   const _get_stats = (path, file) => {
-    return new Promise(resolve => {
-      fs.stat(path + '/' + file.name, function(err, stats) {
-        const {size, mode, atimeMs, ctimeMs, mtimeMs} = stats;
-        // optimization -- we change the file directly and don't touch it
-        Object.assign(file, {
-          isFile: stats.isFile(),
-          isDirectory: stats.isDirectory(),
-          size, mode, atimeMs, ctimeMs, mtimeMs,
-        });
+    return new Promise((resolve, reject) => {
+      fs.stat(path + pathDelimiter + file.name, function(err, stats) {
+        if (err || !stats) {
+          // permissions error -- so ignore the file
+          file = null
+        } else {
+          const {size, mode, atimeMs, ctimeMs, mtimeMs} = stats;
+          // optimization -- we change the file directly and don't touch it
+          Object.assign(file, {
+            isFile: stats.isFile(),
+            isDirectory: stats.isDirectory(),
+            size, mode, atimeMs, ctimeMs, mtimeMs,
+          });
+        }
         resolve(file);
       });
     });
@@ -329,7 +338,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     Promise.all(info_promises).then(file_infos => {
       console.time('resolve info_promises');
       // optimization -- now we force the file to be updated
-      file_infos.forEach(file => touch(`files[id=${file.id}]`));
+      file_infos.filter(file => file !== null).forEach(file => touch(`files[id=${file.id}]`));
       console.timeEnd('resolve info_promises');
       if (files.length) {
         setTimeout(add_info, 20);
@@ -347,14 +356,14 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     }
     console.time(`list_path ${path}`);
     const folders = [];
-    if (path !== '/') {
-      const paths = path.split('/');
+    if (path !== pathDelimiter) {
+      const paths = path.split(pathDelimiter);
       paths.pop();
-      let folder_path = '';
+      let folder_path = pathDelimiter === '/' ? '/' : '';
       paths.forEach(name => {
-        folder_path += `/${name}`;
+        folder_path += name + pathDelimiter;
         folders.unshift({
-          name: name || '/',
+          name: name || pathDelimiter,
           path: folder_path,
         });
       });
@@ -363,10 +372,10 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     fs.readdir(path, (err, items) => {
       set({
         path,
-        name: path.split('/').pop() || '/',
+        name: path.split(pathDelimiter).pop() || pathDelimiter,
         root: path.length <= 1,
-        files: items.
-          filter(name => !/\r/.test(name)).
+        files: (items || []).
+          filter(name => !/\r/.test(name)). // FIXME filter out protected files in Windows
           map(name => {
             return {
               name,
@@ -383,13 +392,13 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   }
 
   function parent () {
-    list_path (get('path').split('/').slice(0, -1).join('/') || '/');
+    list_path (get('path').split(pathDelimiter).slice(0, -1).join(pathDelimiter) || pathDelimiter);
   }
 
   function open (evt, target) {
     const file = b8r.getListInstance(target);
     if (file.isDirectory) {
-      list_path (`${get('path')}/${file.name}`);
+      list_path (`${get('path')}${pathDelimiter}${file.name}`);
     }
   }
 
@@ -448,7 +457,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     show_folders,
     show_settings,
     show_hidden: false,
-    hide_menus 
+    hide_menus
   });
 
   menu.setApplicationMenu([
@@ -466,7 +475,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
             const {remote} = require('electron')
             remote.getCurrentWindow().webContents.toggleDevTools()
           },
-          accelerator: 'Command+Shift+I'
+          accelerator: 'CommandOrControl+Shift+I'
         },
         {
           label: 'Reload',
@@ -474,7 +483,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
             const {remote} = require('electron')
             remote.getCurrentWindow().webContents.reload()
           },
-          accelerator: 'Command+R'
+          accelerator: 'CommandOrControl+R'
         }])
       ],
     },

@@ -1,15 +1,15 @@
 const { app, BrowserWindow } = require('electron')
 
 // custom protocol workaround for electron ESM support
-const { protocol } = require( 'electron' )
-const nfs = require( 'fs' )
-const npjoin = require( 'path' ).join
+const { protocol } = require('electron')
+const nfs = require('fs')
+const npjoin = require('path').join
 const es6Path = __dirname
 
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'es6',
-    privileges: {standard: true, secure: true, supportFetchAPI: true}
+    privileges: { standard: true, secure: true, supportFetchAPI: true }
   }
 ])
 
@@ -33,17 +33,25 @@ const mimeType = (fileName) => {
   return mimeTypes[ext] || 'application/octet-stream'
 }
 
-app.on( 'ready', () => {
-  protocol.registerBufferProtocol( 'es6', ( req, cb ) => {
-    let {url} = req
+app.on('ready', () => {
+
+  protocol.registerBufferProtocol('es6', (req, pbcb) => {
+    let { url } = req
     url = url.split(/#|\?/)[0]
     if (url.substr(-1) === '/') {
       url = url.substr(0, url.length - 1)
     }
     console.log(url)
     nfs.readFile(
-      npjoin( es6Path, url.replace( /es6:\/\//, '' ) ),
-      (e, b) => { cb( { mimeType: mimeType(url), data: b } ) }
+      npjoin(es6Path, url.replace(/es6:\/\//, '')),
+
+      (error, data) => {
+        if (error) {
+          console.error(error, url)
+        } else {
+          pbcb({ mimeType: mimeType(url), data })
+        }
+      }
     )
   })
   createWindow()
@@ -51,10 +59,10 @@ app.on( 'ready', () => {
 
 function createWindow () {
   // Create the browser window.
-  let win = new BrowserWindow({ 
-    minWidth: 512, 
-    minHeight: 384, 
-    width: 800, 
+  const win = new BrowserWindow({
+    minWidth: 512,
+    minHeight: 384,
+    width: 800,
     height: 600,
     webPreferences: { nodeIntegration: true }
   })
