@@ -442,6 +442,7 @@ export default {
     const { viaTag } = await import('es6://node_modules/@tonioloewald/b8r/lib/scripts.js')
     const { jsfeat } = await viaTag('es6://node_modules/@tonioloewald/b8r/third-party/jsfeat-min.js')
     const { relayTo } = await import('es6://node_modules/@tonioloewald/b8r/lib/resize.js')
+    const { unique } = await import('es6://node_modules/@tonioloewald/b8r/source/uuid.js')
     const { isElectron } = await import('es6://node_modules/@tonioloewald/b8r/lib/runtime-environment.js')
     const scroller = findOne('.raw-viewer-scroller')
     const { processImage } = await import('es6://lib/image-labeling.js')
@@ -455,20 +456,14 @@ export default {
       document.body.style.overflow = 'hidden'
     }
 
-    relayTo(scroller)
-
     /* electron-require */
     const fs = require('fs')
     const { exec } = require('child_process')
-
-
-
     const MAX_PROCESSING = 2
     const PREVIEW_SIZE = 256
     const PREGENERATE_PREVIEWS = true
     const PREVIEW_PATH = `/tmp/thumbs-${PREVIEW_SIZE}`
     const FULLSIZE_PATH = '/tmp/fullsize'
-
 
     let rawfilesVisible = []
     set({ processing: 0 })
@@ -480,8 +475,6 @@ export default {
 
     const reportError = err => { if (err) console.error(err) }
 
-
-
     const extractDate = datestring => datestring.match(/[0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}/)[0]
     const filter = { filename: '', tags: '' }
     filter.min_date = filter.max_date = extractDate(new Date().toISOString())
@@ -489,7 +482,13 @@ export default {
     set({ sort_by: 'date' })
 
     const process = rawfile => {
-      const { _auto_, filepath, tags } = rawfile
+      const { filepath, tags } = rawfile
+      // consider adding a utility function to b8r to do this (e.g. b8r._auto_(object))
+      if (!rawfile._auto_) {
+        rawfile._auto_ = unique()
+      }
+      const {_auto_} = rawfile
+
       const preview = `${PREVIEW_PATH}/${rawfile.filename}.png`
       // console.log('generating', preview, {processing, waiting: waiting.length});
       set(`rawfiles[_auto_=${_auto_}].generating_preview`, true)
@@ -499,7 +498,6 @@ export default {
         if (document.body.contains(component)) {
           set(`rawfiles[_auto_=${_auto_}].generating_preview`, false)
           set(`rawfiles[_auto_=${_auto_}].preview`, 'file://' + preview)
-
 
           const img = await imagePromise('file://' + preview)
           /*
@@ -553,8 +551,6 @@ export default {
               err => {
                 if (err) {
                   console.error(`${filepath} RAW conversion failed`, err)
-
-
                 }
                 clearTimeout(timeout)
                 done()
@@ -571,8 +567,6 @@ export default {
         (err, stdout) => {
           if (err) {
             console.error(`${filepath} metadata extraction failed`, err)
-
-
             done()
           } else {
             const metadata = {}
@@ -585,7 +579,6 @@ export default {
                   : value.match(/\w[^,)"]*/g).map(s => s.trim())
               }
             })
-
 
             const creationDate = extractDate(metadata.CreationDate)
             if (creationDate && creationDate < filter.min_date) {
@@ -609,8 +602,6 @@ export default {
     }
 
     const dequeue = () => {
-
-
       if (get().processing >= MAX_PROCESSING) {
         return
       }
@@ -659,8 +650,6 @@ export default {
       )
     }
 
-
-
     const closeDetail = () => {
       set('rawfile', null)
       b8r.afterUpdate(() => b8r.trigger('resize', scroller))
@@ -687,8 +676,6 @@ export default {
           `sips -s format jpeg -r ${rot} -s formatOptions 90 "${filepath}" --out "${fullsize}"`,
           err => {
             if (err) {
-
-
               /* global alert */
               alert(`${filepath} RAW conversion failed`, err)
               closeDetail()
@@ -702,8 +689,6 @@ export default {
             }
           }
         )
-
-
       }
     }
 
@@ -715,8 +700,6 @@ export default {
 
     const slice = (list, container) => {
       const filter = get('filter')
-
-
       const requiredTags = (filter.tags || '').split(',').map(s => s.trim()).filter(s => !!s)
       const filtered = list.filter(rawfile => {
         const { CreationDate } = rawfile.metadata || {}
@@ -728,7 +711,6 @@ export default {
                ) &&
                (!created || (created >= filter.min_date && created <= filter.max_date))
       })
-
 
       rawfilesVisible = biggrid.slice(filtered.sort(sortMethods[get('sort_by')]), container)
       dequeue()
@@ -750,7 +732,6 @@ export default {
       const command = `xattr -w com.apple.metadata:_kMDItemUserTags '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><array>${xml}</array></plist>' "${filepath}"`
       exec(command, reportError)
     }
-
 
     const updateFilter = b8r.debounce(() => touch('rawfiles'), 500)
     const trash = () => {
