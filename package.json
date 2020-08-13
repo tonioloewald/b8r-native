@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
+
     "dist": "npx standard --fix && electron-builder",
     "lint": "node node_modules/standard/bin/cmd.js --fix"
   },
@@ -29,6 +30,7 @@
   },
   "standard": {
     "ignore": [
+
       "/icomoon/",
       "/branches/",
       "/third-party/",

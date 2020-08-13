@@ -437,7 +437,6 @@ export default {
     
   </div>`,
   load: async ({ get, set, component, b8r, touch, findOne }) => {
-
     const { biggrid } = await import('es6://node_modules/@tonioloewald/b8r/lib/biggrid.js')
     const { imagePromise } = await import('es6://node_modules/@tonioloewald/b8r/source/b8r.imgSrc.js')
     const { viaTag } = await import('es6://node_modules/@tonioloewald/b8r/lib/scripts.js')
@@ -463,11 +462,13 @@ export default {
     const { exec } = require('child_process')
 
 
+
     const MAX_PROCESSING = 2
     const PREVIEW_SIZE = 256
     const PREGENERATE_PREVIEWS = true
     const PREVIEW_PATH = `/tmp/thumbs-${PREVIEW_SIZE}`
     const FULLSIZE_PATH = '/tmp/fullsize'
+
 
     let rawfilesVisible = []
     set({ processing: 0 })
@@ -478,6 +479,7 @@ export default {
     const context2d = canvas.getContext('2d')
 
     const reportError = err => { if (err) console.error(err) }
+
 
 
     const extractDate = datestring => datestring.match(/[0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}/)[0]
@@ -497,6 +499,7 @@ export default {
         if (document.body.contains(component)) {
           set(`rawfiles[_auto_=${_auto_}].generating_preview`, false)
           set(`rawfiles[_auto_=${_auto_}].preview`, 'file://' + preview)
+
 
           const img = await imagePromise('file://' + preview)
           /*
@@ -551,6 +554,7 @@ export default {
                 if (err) {
                   console.error(`${filepath} RAW conversion failed`, err)
 
+
                 }
                 clearTimeout(timeout)
                 done()
@@ -568,6 +572,7 @@ export default {
           if (err) {
             console.error(`${filepath} metadata extraction failed`, err)
 
+
             done()
           } else {
             const metadata = {}
@@ -580,6 +585,7 @@ export default {
                   : value.match(/\w[^,)"]*/g).map(s => s.trim())
               }
             })
+
 
             const creationDate = extractDate(metadata.CreationDate)
             if (creationDate && creationDate < filter.min_date) {
@@ -595,6 +601,7 @@ export default {
             }
             set(`rawfiles[_auto_=${_auto_}].metadata`, metadata)
 
+
             getPreview()
           }
         }
@@ -602,6 +609,7 @@ export default {
     }
 
     const dequeue = () => {
+
 
       if (get().processing >= MAX_PROCESSING) {
         return
@@ -652,6 +660,7 @@ export default {
     }
 
 
+
     const closeDetail = () => {
       set('rawfile', null)
       b8r.afterUpdate(() => b8r.trigger('resize', scroller))
@@ -669,6 +678,7 @@ export default {
         rawfile.generating_fullsize = true
         const rot = rawfile.metadata.Orientation === '1' ? -90 : 0
 
+
         set({ rawfile })
         console.log(rawfile)
         b8r.trigger('resize', scroller)
@@ -677,6 +687,7 @@ export default {
           `sips -s format jpeg -r ${rot} -s formatOptions 90 "${filepath}" --out "${fullsize}"`,
           err => {
             if (err) {
+
 
               /* global alert */
               alert(`${filepath} RAW conversion failed`, err)
@@ -692,6 +703,7 @@ export default {
           }
         )
 
+
       }
     }
 
@@ -704,6 +716,7 @@ export default {
     const slice = (list, container) => {
       const filter = get('filter')
 
+
       const requiredTags = (filter.tags || '').split(',').map(s => s.trim()).filter(s => !!s)
       const filtered = list.filter(rawfile => {
         const { CreationDate } = rawfile.metadata || {}
@@ -715,6 +728,7 @@ export default {
                ) &&
                (!created || (created >= filter.min_date && created <= filter.max_date))
       })
+
 
       rawfilesVisible = biggrid.slice(filtered.sort(sortMethods[get('sort_by')]), container)
       dequeue()
@@ -737,6 +751,7 @@ export default {
       exec(command, reportError)
     }
 
+
     const updateFilter = b8r.debounce(() => touch('rawfiles'), 500)
     const trash = () => {
       const rawfile = get('rawfile')
@@ -747,6 +762,7 @@ export default {
       set('rawfile', null)
       touch('rawfiles')
     }
+
 
 
     set({ slice, pick, closeDetail, rawfiles: [], edit, reveal, preview, tag, updateFilter, trash })

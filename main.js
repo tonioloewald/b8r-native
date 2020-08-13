@@ -35,7 +35,7 @@ const mimeType = (fileName) => {
 
 app.on('ready', () => {
 
-  protocol.registerBufferProtocol('es6', (req, pbcb) => {
+  protocol.registerBufferProtocol('es6', (req, respond) => {
     let { url } = req
     url = url.split(/#|\?/)[0]
     if (url.substr(-1) === '/') {
@@ -45,13 +45,7 @@ app.on('ready', () => {
     nfs.readFile(
       npjoin(es6Path, url.replace(/es6:\/\//, '')),
 
-      (error, data) => {
-        if (error) {
-          console.error(error, url)
-        } else {
-          pbcb({ mimeType: mimeType(url), data })
-        }
-      }
+      (e, b) => { respond({ mimeType: mimeType(url), data: b }) }
     )
   })
   createWindow()
