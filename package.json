@@ -3,6 +3,10 @@
   "version": "0.0.4",
   "description": "native app template for b8r",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tonioloewald/b8r-native.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
