@@ -34,7 +34,6 @@ const mimeType = (fileName) => {
 }
 
 app.on('ready', () => {
-
   protocol.registerBufferProtocol('es6', (req, respond) => {
     let { url } = req
     url = url.split(/#|\?/)[0]

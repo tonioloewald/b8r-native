@@ -1,12 +1,11 @@
 {
   "name": "b8r-native-example",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "native app template for b8r",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-
     "dist": "npx standard --fix && electron-builder",
     "lint": "node node_modules/standard/bin/cmd.js --fix"
   },
@@ -17,10 +16,12 @@
   ],
   "author": "Tonio Loewald",
   "license": "BSD-3-Clause",
+  "dependencies": {
+    "@tonioloewald/b8r": "^0.3.0"
+  },
   "devDependencies": {
-    "@tonioloewald/b8r": "^0.3.0",
     "electron": "^7.3.2",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.8.1",
     "standard": "^14.3.4"
   },
   "build": {
@@ -30,7 +31,6 @@
   },
   "standard": {
     "ignore": [
-
       "/icomoon/",
       "/branches/",
       "/third-party/",
