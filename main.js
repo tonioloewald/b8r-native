@@ -5,7 +5,7 @@ const { protocol } = require('electron')
 const nfs = require('fs')
 const npjoin = require('path').join
 const es6Path = __dirname
-
+const isMacOS = process.platform === 'darwin'
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'es6',
@@ -57,7 +57,7 @@ function createWindow () {
     minHeight: 384,
     width: 800,
     height: 600,
-    frame: false,
+    frame: isMacOS,
     webPreferences: { nodeIntegration: true }
   })
 

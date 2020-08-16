@@ -79,7 +79,7 @@
     }
   </style>
   <div class="app-layout">
-    <div class="app-bar">
+    <div class="app-bar" data-bind="hide_if=app.isMacOS">
       <img src="build/icon.png" class="favicon">
       <b8r-component path="es6://node_modules/@tonioloewald/b8r/components/menubar" style="height: 28px;">
         <li>
@@ -152,6 +152,7 @@
           b8r.set('app.isMaximized', true)
         }
       },
+      isMacOS: remote.process.platform === 'darwin',
       isMaximized: remote.getCurrentWindow().isMaximized(),
       darkmode: remote.nativeTheme.shouldUseDarkColors,
     })
