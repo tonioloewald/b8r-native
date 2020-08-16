@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="node_modules/@tonioloewald/b8r/css/b8r.css">
   <link rel="stylesheet" type="text/css" href="icomoon/style.css">
 </head>
-<body data-event="keydown(ctrl-shift-I):app.toggleDebug">
+<body data-event="keydown(ctrl-shift-I):app.toggleDebug;" data-bind="class(darkmode)=app.darkmode">
   <!-- 
     path is where the action is. Example paths to try:
     - components/electron-file-browser
@@ -15,10 +15,98 @@
     - node_modules/@tonioloewald/b8r/components/richtext
     - node_modules/@tonioloewald/b8r/components/kitchen-sink
   -->
-  <b8r-component
-    style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh"
-    path="es6://components/electron-file-browser"
-  ></b8r-component>
+  <style>
+    body {
+      --body-font-size: 13px; 
+      --ui-font: var(--body-font-size) system-ui, Sans-serif;
+    }
+    .menubar-component {
+      background: none !important;
+    }
+    .app-bar .favicon {
+      max-height: 14px;
+      margin: 8px 10px;
+      -webkit-app-region: drag;
+    }
+    .app-layout {
+      display: flex; 
+      flex-direction: column; 
+      width: 100vw; 
+      height: 100vh;
+    }
+    .app-layout > .app-bar {
+      flex: 0 0 30px; 
+      display: flex;
+      z-index: 1;
+      background: var(--content-bg);
+    }
+    .app-layout > .app-bar > .menubar-component {
+      align-self: flex-end;
+    }
+    .app-bar button {
+      width: 44px;
+      border: 0;
+      margin: 0;
+      height: 30px;
+      box-shadow: none;
+      border-radius: 0;
+      background: transparent;
+      fill: var(--faded-text-color);
+    }
+
+    .app-bar button:hover {
+      fill: var(--text-color);
+      background: var(--black-10);
+    }
+
+    .app-bar .quit:hover {
+      fill: #eee;
+      background: #f32;
+    }
+
+    .app-bar svg {
+      transform: translateY(1px);
+    }
+  </style>
+  <div class="app-layout">
+    <div class="app-bar">
+      <img src="build/icon.png" class="favicon">
+      <b8r-component path="es6://node_modules/@tonioloewald/b8r/components/menubar" style="height: 28px;">
+        <li>
+          File
+          <ul>
+            <li data-shortcut="ctrl-R" data-event="menuclick:app.reload">Reload</li>
+            <li class="separator"></li>
+            <li data-shortcut="ctrl-Q" data-event="menuclick:app.quit">Quit</li>
+          </ul>
+        </li>
+        <li>
+          Debug
+          <ul>
+            <li data-shortcut="ctrl-shift-I" data-event="menuclick:app.toggleDebug">Toggle Developer Tools</li>
+          </ul>
+        </li>
+      </b8r-component>
+      <!-- icons adapted from data-urls in https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/src -->
+      <div style="-webkit-app-region: drag; flex: 1 1 auto">&nbsp;</div>
+      <button aria-label="minimize" data-event="click:app.minimize">
+        <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M11 4.399V5.5H0V4.399h11z' /></svg>
+      </button>
+      <button aria-label="maximize" data-bind="hide_if=app.isMaximized" data-event="click:app.maximize">
+        <svg width='11' height='11' viewBox='0 0 11 11'  xmlns='http://www.w3.org/2000/svg'><path d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z'/></svg>
+      </button>
+      <button aria-label="unmaximize" data-bind="show_if=app.isMaximized" data-event="click:app.maximize">
+        <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' /></svg>
+      </button>
+      <button aria-label="quit" class="quit window-close" data-event="click:app.quit">
+        <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z'/></svg>
+      </button>
+    </div>
+    <b8r-component
+      style="flex: 0 1 auto; width: 100%; overflow-y: auto; overflow-y: overlay;"
+      path="es6://components/electron-file-browser"
+    ></b8r-component>
+  </div>
   <script type="module">
     // using the source version of b8r.js because we import from libraries that import
     // directly from b8r source files.
@@ -33,10 +121,35 @@
     window.b8r = b8r;
 
     // this implements a hidden keystroke for toggling the debug tools
+    const {remote} = require('electron');
     b8r.register('app', {
       toggleDebug() {
-        require('electron').remote.getCurrentWebContents().toggleDevTools()
-      }
+        remote.getCurrentWebContents().toggleDevTools()
+      },
+      reload () {
+        remote.getCurrentWindow().webContents.reload()
+      },
+      quit () {
+        remote.getCurrentWindow().close()
+      },
+      minimize () {
+        remote.getCurrentWindow().minimize()
+      },
+      maximize () {
+        if (remote.getCurrentWindow().isMaximized()) {
+          remote.getCurrentWindow().unmaximize()
+          b8r.set('app.isMaximized', false)
+        } else {
+          remote.getCurrentWindow().maximize()
+          b8r.set('app.isMaximized', true)
+        }
+      },
+      isMaximized: remote.getCurrentWindow().isMaximized(),
+      darkmode: remote.nativeTheme.shouldUseDarkColors,
+    })
+
+    remote.nativeTheme.on('updated', () => {
+      b8r.set('app.darkmode', remote.nativeTheme.shouldUseDarkColors)
     })
   </script>
 </body>

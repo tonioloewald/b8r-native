@@ -6,7 +6,7 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
 <style>
   .documentation-component .electron-file-browser-component {
     height: 50vh;
-    border: 1px solid var(--black-10));
+    border: 1px solid var(--black-10);
   }
 
   .electron-file-browser-component :focus,
@@ -22,7 +22,6 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   }
 
   .electron-file-browser-component > .fb-header {
-    -webkit-app-region: drag;
     padding: 5px 10px;
     display: flex;
     flex: 0 0 41px;
@@ -271,7 +270,6 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
   /* global b8r, findOne, component, data, get, set, on, console, touch, process */
   'use strict';
   const {biggrid} = await import('../lib/biggrid.js')
-  const menu = require('./lib/electron-menu.js')
   const {isPackaged} = require('./lib/is-packaged.js')
   const {isElectron, isNwjs} = await import('../lib/runtime-environment.js')
   let pick, home, pathDelimiter
@@ -464,34 +462,4 @@ A file browser for use in [Electron](https://electronjs.org) Apps (also works in
     show_hidden: false,
     hide_menus
   });
-
-  menu.setApplicationMenu([
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Open Folder',
-          click: pick,
-          accelerator: 'CommandOrControl+O'
-        },
-        ...(isPackaged ? [] : [{
-          label: 'Toggle Developer Tools',
-          click() {
-            const {remote} = require('electron')
-            remote.getCurrentWindow().webContents.toggleDevTools()
-          },
-          accelerator: 'CommandOrControl+Shift+I'
-        },
-        {
-          label: 'Reload',
-          click() {
-            const {remote} = require('electron')
-            remote.getCurrentWindow().webContents.reload()
-          },
-          accelerator: 'CommandOrControl+R'
-        }])
-      ],
-    },
-    menu.editMenu,
-  ]);
 </script>
