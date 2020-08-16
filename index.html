@@ -20,29 +20,35 @@
       --body-font-size: 13px; 
       --ui-font: var(--body-font-size) system-ui, Sans-serif;
     }
+
     .menubar-component {
       background: none !important;
     }
+
     .app-bar .favicon {
       max-height: 14px;
       margin: 8px 10px;
       -webkit-app-region: drag;
     }
+
     .app-layout {
       display: flex; 
       flex-direction: column; 
       width: 100vw; 
       height: 100vh;
     }
+
     .app-layout > .app-bar {
       flex: 0 0 30px; 
       display: flex;
       z-index: 1;
       background: var(--content-bg);
     }
+
     .app-layout > .app-bar > .menubar-component {
       align-self: flex-end;
     }
+
     .app-bar button {
       width: 44px;
       border: 0;
@@ -52,6 +58,10 @@
       border-radius: 0;
       background: transparent;
       fill: var(--faded-text-color);
+    }
+
+    .app-bar button:focus {
+      background: var(--light-accent-color);
     }
 
     .app-bar button:hover {
@@ -92,11 +102,9 @@
       <button aria-label="minimize" data-event="click:app.minimize">
         <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M11 4.399V5.5H0V4.399h11z' /></svg>
       </button>
-      <button aria-label="maximize" data-bind="hide_if=app.isMaximized" data-event="click:app.maximize">
-        <svg width='11' height='11' viewBox='0 0 11 11'  xmlns='http://www.w3.org/2000/svg'><path d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z'/></svg>
-      </button>
-      <button aria-label="unmaximize" data-bind="show_if=app.isMaximized" data-event="click:app.maximize">
-        <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' /></svg>
+      <button aria-label="toggle maximize" data-event="click:app.maximize">
+        <svg data-bind="hide_if=app.isMaximized" width='11' height='11' viewBox='0 0 11 11'  xmlns='http://www.w3.org/2000/svg'><path d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z'/></svg>
+        <svg data-bind="show_if=app.isMaximized" width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' /></svg>
       </button>
       <button aria-label="quit" class="quit window-close" data-event="click:app.quit">
         <svg width='11' height='11' viewBox='0 0 11 11' xmlns='http://www.w3.org/2000/svg'><path d='M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z'/></svg>
