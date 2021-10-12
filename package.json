@@ -24,7 +24,7 @@
     "@tonioloewald/b8r": "^0.3.1"
   },
   "devDependencies": {
-    "electron": "^7.3.2",
+    "electron": "^11.5.0",
     "electron-builder": "^22.8.1",
     "standard": "^14.3.4"
   },
